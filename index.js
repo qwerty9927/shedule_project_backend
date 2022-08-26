@@ -11,7 +11,7 @@ app.get('/', (req, res) => {
 })
 app.post('/', (req, res) => {
     console.log(req.body)
-    res.json(req.body)
+    res.send('connect')
 })
 app.use((err, req, res, next) => {
     res.status(err.status || 500).json({
