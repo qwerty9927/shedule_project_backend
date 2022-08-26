@@ -3,7 +3,6 @@ const cors = require('cors')
 const app = express()
 
 global.__basedir = __dirname
-const PORT = 5000
 // app.use(cors())
 app.use(express.urlencoded({extended: true}))
 app.use(express.json())
@@ -20,4 +19,4 @@ app.use((err, req, res, next) => {
         meg: err.message
     })
 })
-app.listen(3000)
+app.listen(process.env.PORT || 3000)
