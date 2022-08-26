@@ -20,6 +20,4 @@ app.use((err, req, res, next) => {
         meg: err.message
     })
 })
-app.listen(PORT, () => {
-    console.log(`Listen on port ${PORT}`)
-})
+app.listen(3000)
