@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node index.js"
+    "start": "nodemon index.js"
   },
   "keywords": [
     "example",
@@ -15,9 +15,11 @@
   "license": "ISC",
   "dependencies": {
     "cors": "^2.8.5",
+    "dotenv": "^16.0.1",
     "express": "^4.18.1",
     "heroku": "^7.62.0",
-    "http-errors": "^2.0.0"
+    "http-errors": "^2.0.0",
+    "mongoose": "^6.5.3"
   },
   "engines": {
     "node": "16.x"

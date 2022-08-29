@@ -98,7 +98,8 @@
 		}
 		function send() {
 			console.log("start")
-			const array = [841047]
+			const array = [861305, 862101, 0]
+			
 			const interval = setInterval(() => {
 				if (array.length === 0) {
 					console.log("start clear")
@@ -110,7 +111,8 @@
 					const data = document.querySelectorAll('.body-table')
 					// const data = document.querySelectorAll('#divTDK > .body-table')
 					const formatData = handleData(data)
-					fetch('http://localhost:3000/', {
+					fetch('http://localhost:3000/admin/subject/HK1_2022/DCT', {
+					// fetch('https://test-app-9927.herokuapp.com/', {
 						method: "POST",
 						mode: "no-cors",
 						headers: {
