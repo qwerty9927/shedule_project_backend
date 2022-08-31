@@ -1,7 +1,8 @@
 const express = require('express')
 const cors = require('cors')
 const dotenv = require('dotenv')
-const routerCraw = require('./src/routes/craw.route')
+const routerCraw = require('./src/routes/craw.admin.route')
+const routerAdminSubject = require('./src/routes/subject.admin.route')
 const app = express()
 
 global.__basedir = __dirname
@@ -12,7 +13,8 @@ app.use(express.json())
 app.get('/', (req, res) => {
     res.send('hello')
 })
-app.use('/admin/subject', routerCraw)
+app.use('/admin/craw', routerCraw)
+app.use('/admin/subject', routerAdminSubject)
 app.use((req, res, next) => {
     res.status(404).json({
         status: 404,

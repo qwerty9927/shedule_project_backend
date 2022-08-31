@@ -4,7 +4,7 @@ const CrawModel = require('../models/Craw.model')
 class Craw{
   receiveData(req, res, next){
     const data = JSON.parse(req.body.values)
-    const {code, schoolYear} = req.params
+    const {code, schoolYear, school} = req.params
     const obj = data.map((item, index) => {
       return {
         MaMH: item[1],
@@ -25,7 +25,7 @@ class Craw{
       }
     })
     try{
-      CrawModel.receiveData(obj, code, schoolYear)
+      CrawModel.receiveData(obj, {code, schoolYear, school})
       res.sendStatus(200)
     } catch(e){
       next(createError.InternalServerError())
