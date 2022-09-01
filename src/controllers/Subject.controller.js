@@ -2,7 +2,7 @@ const createError = require('http-errors')
 const SubjectModel = require('../models/Subject.model')
 
 class Subject {
-  async getSubject(req, res, next){
+  async getSubject(req, res, next) {
     const { school, schoolYear, code } = req.query
     try {
       const result = await SubjectModel.getSubject({ school, schoolYear, code })
@@ -10,7 +10,7 @@ class Subject {
         status: 200,
         result
       })
-    } catch(err){
+    } catch (err) {
       console.log(err)
       next(createError.InternalServerError())
     }
@@ -58,6 +58,20 @@ class Subject {
     } catch (err) {
       console.log(err)
       next(createError.InternalServerError())
+    }
+  }
+
+  async searchSubject(req, res, next) {
+    const { value, page, pageSize, school, schoolYear } = req.query
+    try {
+      const result = await SubjectModel.searchSubject({ value, page, pageSize }, {school, schoolYear})
+      res.status(200).json({
+        status: 200,
+        result
+      })
+    } catch (err) {
+      console.log(err)
+      throw err
     }
   }
 

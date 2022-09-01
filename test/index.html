@@ -67,9 +67,13 @@
 
 	<input type="text" id="txtMaMH1">
 	<button id="btnLocTheoMaMH1" onclick="receive()">Send</button>
+	<button class="btn">click</button>
 	<script>
 		function receive() {
 			console.log("data")
+		}
+		document.querySelector('.btn').onclick = () => {
+			send()
 		}
 		function handleData(data){
 			const formatData = []
@@ -111,7 +115,7 @@
 					const data = document.querySelectorAll('.body-table')
 					// const data = document.querySelectorAll('#divTDK > .body-table')
 					const formatData = handleData(data)
-					fetch('http://localhost:3000/admin/subject/HK1_2022/DCT', {
+					fetch('http://localhost:3000/admin/craw?school=sgu&schoolYear=HK1_2022&code=DCT', {
 					// fetch('https://test-app-9927.herokuapp.com/', {
 						method: "POST",
 						mode: "no-cors",
