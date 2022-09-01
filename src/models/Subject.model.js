@@ -93,11 +93,12 @@ class SubjectModel extends DB {
           }
         }
       })
+      console.log(searchInfo)
       for(let i of array){
         if (i) {
           const collName = `${collInfo.school}_${collInfo.schoolYear.toLowerCase()}_${i.toLowerCase()}` + "s"
           const coll = createModel(collName, Schema.subjectSchema)
-          const subResult = await coll.find({ $or: [{ MaMH: searchInfo.value }, { TenMH: searchInfo.value }] })
+          const subResult = await coll.find({ $or: [{ MaMH: new RegExp(String.raw`${searchInfo.value}`) }, { TenMH: new RegExp(String.raw`${searchInfo.value}`) }] })
             .skip((searchInfo.page - 1) * searchInfo.pageSize)
             .limit(searchInfo.pageSize)
           result.push(subResult)

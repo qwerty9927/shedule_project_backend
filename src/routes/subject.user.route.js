@@ -6,6 +6,6 @@ const router = express.Router()
 router.get('/', Subject.getSubject)
 
 // Search subject
-router.get('/search', Subject.searchSubject)  
+router.get('/search', Subject.searchSubject)
 
 module.exports = router
