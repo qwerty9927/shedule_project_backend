@@ -4,7 +4,7 @@ const CrawModel = require('../models/Craw.model')
 class Craw{
   receiveData(req, res, next){
     const data = JSON.parse(req.body.values)
-    const {code, schoolYear, school} = req.params
+    const {code, schoolYear, school} = req.query
     const obj = data.map((item, index) => {
       return {
         MaMH: item[1],
