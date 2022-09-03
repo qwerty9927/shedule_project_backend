@@ -3,78 +3,67 @@ const fs = require('fs')
 const DB = require('./DB.model')
 const Schema = require('./Schema.model')
 const createModel = require('../services/createModel.service')
+require('../utils/dbTool')
+require('dotenv').config()
 class SubjectModel extends DB {
   constructor() {
     super()
   }
 
-  static checkIsExists(_this, collName) {
-    return new Promise((resolve) => {
-      _this.connection.db.listCollections({ name: collName })
-        .next(async (err, coll) => {
-          if (coll) {
-            resolve(true)
-          } else {
-            console.log("Collection not exisis")
-            resolve(false)
-          }
-        })
-    })
-  }
-
-  async getSubject(collInfo) {
-    const collName = `${collInfo.school}_${collInfo.schoolYear.toLowerCase()}_${collInfo.code.toLowerCase()}` + "s"
-    const isExists = SubjectModel.checkIsExists(this, collName)
-    if (isExists) {
-      const result = createModel(collName, Schema.subjectSchema).find()
-      console.log(result)
-      return result
-    } else {
-      throw new Error("error db")
-    }
-  }
-
   async insertSubject(data, collInfo) {
-    const collName = `${collInfo.school}_${collInfo.schoolYear.toLowerCase()}_${collInfo.code.toLowerCase()}` + "s"
-    const isExists = SubjectModel.checkIsExists(this, collName)
-    if (isExists) {
-      const coll = createModel(collName, Schema.subjectSchema)
-      try {
-        await coll.create(data)
-      } catch (err) {
-        console.log(err)
-        throw err
-      }
-    } else {
-      throw new Error("error db")
+    const collName = collInfo.school.toLowerCase()
+    const name = `${collName}_${collInfo.schoolYear.toLowerCase()}_${collInfo.code.toLowerCase()}`
+    const Model = createModel(collName, Schema.subjectSchema)
+    try {
+      await Model.updateOne({ Name: name }, { $push: { Subject: data.values } })
+    } catch (err) {
+      console.log(err)
+      throw err
     }
+  }
+
+  handleData(data) {
+    const dataHandled = {}
+    const pattern = "Subject.$"
+    Object.keys(data).forEach(item => {
+      dataHandled[`${pattern}.${item}`] = data[item]
+    })
+    return dataHandled
   }
 
   async updateSubject(data, collInfo) {
-    const collName = `${collInfo.school}_${collInfo.schoolYear.toLowerCase()}_${collInfo.code.toLowerCase()}` + "s"
-    const isExists = SubjectModel.checkIsExists(this, collName)
-    if (isExists) {
-      const coll = createModel(collName, Schema.subjectSchema)
-      try {
-        await coll.updateOne({ _id: data._id }, { $set: data.values })
-      } catch (err) {
-        console.log(err)
-        throw err
-      }
-    } else {
-      throw new Error("error db")
+    const collName = collInfo.school.toLowerCase()
+    const name = `${collName}_${collInfo.schoolYear.toLowerCase()}_${collInfo.code.toLowerCase()}`
+    const Model = createModel(collName, Schema.subjectSchema)
+    const values = this.handleData(data.values)
+    try {
+      await Model.updateOne({ Name: name, "Subject._id": ObjectId(data._id) }, values)
+    } catch (err) {
+      console.log(err)
+      throw err
     }
   }
 
   async deleteSubject(id, collInfo) {
-    const collName = `${collInfo.school}_${collInfo.schoolYear.toLowerCase()}_${collInfo.code.toLowerCase()}` + "s"
-    const isExists = SubjectModel.checkIsExists(this, collName)
+    const collName = collInfo.school.toLowerCase()
+    const name = `${collName}_${collInfo.schoolYear.toLowerCase()}_${collInfo.code.toLowerCase()}`
+    const Model = createModel(collName, Schema.subjectSchema)
+    try {
+      await Model.updateOne({ Name: name }, { $pull: { Subject: { _id: ObjectId(id) } } })
+    } catch (err) {
+      console.log(err)
+      throw err
+    }
+
+  }
+
+  async getSubject(collInfo) {
+    const name = `${collInfo.school.toLowerCase()}_${collInfo.schoolYear.toLowerCase()}_${collInfo.code.toLowerCase()}`
+    const Model = createModel(collInfo.school.toLowerCase(), Schema.subjectSchema)
+    const isExists = await Model.exists({ Name: name })
     if (isExists) {
-      const coll = createModel(collName, Schema.subjectSchema)
-      const result = await coll.deleteOne({ _id: ObjectId(id) })
-      if (!result.deletedCount) {
-        throw new Error("none exists")
-      }
+      const result = await Model.find()
+      return result[0].Subject
     } else {
       throw new Error("error db")
     }
@@ -82,33 +71,49 @@ class SubjectModel extends DB {
 
   async searchSubject(searchInfo, collInfo) {
     const result = []
+    const indexStartSearch = 2
+    const indexNameSubject = 1
+    let sizeNeed = process.env.DB_DEFAULT_COUNT_SELECT // support for limit
+
     try {
       const path = __basedir + `\\src\\docs\\${collInfo.school}.txt`
       const data = fs.readFileSync(path, "utf8")
       const array = data.split('#').map(itemRoot => {
         const temp = itemRoot.split('\r\n')
-        for (let i of temp) {
-          if (i.includes(searchInfo.value)) {
-            return (temp[0] || temp[1])
-          }
+        const compareArr = temp[indexStartSearch].toLowerCase().split('*')
+        if (compareArr[0].startsWith(searchInfo.value) || compareArr[1].startsWith(searchInfo.value)) {
+          return temp[indexNameSubject]
         }
       })
-      console.log(searchInfo)
-      for(let i of array){
+      console.log(array)
+      for (let i of array) {
         if (i) {
-          const collName = `${collInfo.school}_${collInfo.schoolYear.toLowerCase()}_${i.toLowerCase()}` + "s"
-          const coll = createModel(collName, Schema.subjectSchema)
-          const subResult = await coll.find({ $or: [{ MaMH: new RegExp(String.raw`${searchInfo.value}`) }, { TenMH: new RegExp(String.raw`${searchInfo.value}`) }] })
-            .skip((searchInfo.page - 1) * searchInfo.pageSize)
-            .limit(searchInfo.pageSize)
-          result.push(subResult)
+          const name = `${collInfo.school.toLowerCase()}_${collInfo.schoolYear.toLowerCase()}_${i.toLowerCase()}`
+          const Model = createModel(collInfo.school.toLowerCase(), Schema.subjectSchema)
+          const subResult = await Model.find({
+            Name: name,
+            $or: [
+              {
+                "Subject.MaMH": { $regex: `${searchInfo.value}.*`, $options: 'i' }
+              },
+              {
+                "Subject.TenMH": { $regex: `${searchInfo.value}.*`, $options: 'i' }
+              }
+            ]
+          })
+          result.push(...subResult[0].Subject)
         }
       }
-      return result
+      return result.skip((searchInfo.page - 1) * process.env.DB_DEFAULT_COUNT_SELECT)
+        .limit(process.env.DB_DEFAULT_COUNT_SELECT)
     } catch (err) {
       console.log(err)
       throw err
     }
+  }
+
+  async addSubjectOfShedule(data, collInfo) {
+
   }
 }
 

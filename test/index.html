@@ -9,7 +9,7 @@
 </head>
 
 <body>
-	<!-- <table class="body-table" style="border-collapse: collapse;" rules="all" border="1" cellspacing="0" cellpadding="0">
+	<table class="body-table" style="border-collapse: collapse;" rules="all" border="1" cellspacing="0" cellpadding="0">
 		<tbody><tr style="">
 		<td width="25px" align="center"><input type="checkbox" id="chk_84104701  01" value="84104701  01|841047|Công nghệ phần mềm|01|4|4|01/01/0001|0|0|0||0|DCT120" disabled="" onclick="toDKSelectedChange(this)"></td>
 		
@@ -63,8 +63,9 @@
 		<td width="35px" align="center"><div class="top-fline">Sáu</div><div class="fline">&nbsp;</div><div class="top-fline">Năm</div> </td>
 		<td width="40px" align="center"><div class="top-fline">4</div><div class="fline">&nbsp;</div><div class="top-fline">6</div></td>
 		<td width="30px" align="center"><div class="top-fline">2</div><div class="fline">&nbsp;</div><div class="top-fline">3</div></td>
-		<td width="60px" align="center"><div class="top-fline">C.A110</div><div class="fline">&nbsp;</div><div class="top-fline">C.E203</div></td><td width="35px" align="center"><div class="top-fline">N.Q.Huy</div><div class="fline">&nbsp;</div><div class="top-fline">N.Q.Huy</div></td> <td style="font-size: 12px; font-family: Courier" align="left"><div class="top-fline"><label id="05/09/2022--18/12/2022" style="cursor:pointer" onmouseover="ddrivetip(this.id)" onmouseout="hideddrivetip()">123456789012345</label></div><div class="fline">&nbsp;</div><div class="top-fline"><label id="05/09/2022--18/12/2022" style="cursor:pointer" onmouseover="ddrivetip(this.id)" onmouseout="hideddrivetip()">123456789012345</label></div></td></tr></tbody></table> -->
-		<table class="body-table" style="border-collapse: collapse;" rules="all" border="1" cellspacing="0" cellpadding="0">
+		<td width="60px" align="center"><div class="top-fline">C.A110</div><div class="fline">&nbsp;</div><div class="top-fline">C.E203</div></td><td width="35px" align="center"><div class="top-fline">N.Q.Huy</div><div class="fline">&nbsp;</div><div class="top-fline">N.Q.Huy</div></td> <td style="font-size: 12px; font-family: Courier" align="left"><div class="top-fline"><label id="05/09/2022--18/12/2022" style="cursor:pointer" onmouseover="ddrivetip(this.id)" onmouseout="hideddrivetip()">123456789012345</label></div><div class="fline">&nbsp;</div><div class="top-fline"><label id="05/09/2022--18/12/2022" style="cursor:pointer" onmouseover="ddrivetip(this.id)" onmouseout="hideddrivetip()">123456789012345</label></div></td></tr></tbody></table>
+
+		<!-- <table class="body-table" style="border-collapse: collapse;" rules="all" border="1" cellspacing="0" cellpadding="0">
 			<tbody><tr style="">
 			<td width="25px" align="center"><input type="checkbox" id="chk_86610301    " value="86610301    |866103|Tiếng Anh III|01|3|3|01/01/0001|0|0|0||0|DCT120" disabled="" onclick="toDKSelectedChange(this)"></td>
 			
@@ -327,7 +328,7 @@
 			<td width="35px" align="center"><div class="top-fline">Hai</div> </td>
 			<td width="40px" align="center"><div class="top-fline">3</div></td>
 			<td width="30px" align="center"><div class="top-fline">3</div></td>
-			<td width="60px" align="center"><div class="top-fline">1.A102</div></td><td width="35px" align="center"><div class="top-fline">N.T.Hà</div></td> <td style="font-size: 12px; font-family: Courier" align="left"><div class="top-fline"><label id="05/09/2022--18/12/2022" style="cursor:pointer" onmouseover="ddrivetip(this.id)" onmouseout="hideddrivetip()">123456789012345</label></div></td></tr></tbody></table>
+			<td width="60px" align="center"><div class="top-fline">1.A102</div></td><td width="35px" align="center"><div class="top-fline">N.T.Hà</div></td> <td style="font-size: 12px; font-family: Courier" align="left"><div class="top-fline"><label id="05/09/2022--18/12/2022" style="cursor:pointer" onmouseover="ddrivetip(this.id)" onmouseout="hideddrivetip()">123456789012345</label></div></td></tr></tbody></table> -->
 	<input type="text" id="txtMaMH1">
 	<button id="btnLocTheoMaMH1" onclick="receive()">Send</button>
 	<button class="btn">click</button>
@@ -365,7 +366,7 @@
 		}
 		function send() {
 			console.log("start")
-			const array = [862101, 0]
+			const array = [0]
 			
 			const interval = setInterval(() => {
 				if (array.length === 0) {
@@ -378,7 +379,7 @@
 					const data = document.querySelectorAll('.body-table')
 					// const data = document.querySelectorAll('#divTDK > .body-table')
 					const formatData = handleData(data)
-					fetch('http://localhost:3000/admin/craw?school=sgu&schoolYear=HK1_2022&code=monchung', {
+					fetch('http://localhost:3000/api/admin/craw?school=sgu&schoolYear=HK1_2022&code=DCT', {
 					// fetch('https://test-app-9927.herokuapp.com/', {
 						method: "POST",
 						mode: "no-cors",

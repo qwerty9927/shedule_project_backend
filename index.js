@@ -14,9 +14,9 @@ app.use(express.json())
 app.get('/', (req, res) => {
     res.send('hello')
 })
-app.use('/admin/craw', routerCraw)
-app.use('/admin/subject', routerAdminSubject)
-app.use('/subject', routerUserSubject)
+app.use('/api/admin/craw', routerCraw)
+app.use('/api/admin/subject', routerAdminSubject)
+app.use('/api/subject', routerUserSubject)
 app.use((req, res, next) => {
     res.status(404).json({
         status: 404,
