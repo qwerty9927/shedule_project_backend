@@ -7,15 +7,28 @@ class CrawModel extends DB {
     super()
   }
 
-  receiveData(data, collInfo) {
-    const collName = `${collInfo.school}_${collInfo.schoolYear.toLowerCase()}_${collInfo.code.toLowerCase()}`
-    createModel(collName, Schema.subjectSchema)
-    .insertMany(data, (err) => {
-      if (err) {
-        console.log("err: ", err)
+  async receiveData(data, collInfo) {
+    const name = `${collInfo.school.toLowerCase()}_${collInfo.schoolYear.toLowerCase()}_${collInfo.code.toLowerCase()}`
+    try {
+      const Model = createModel(collInfo.school.toLowerCase(), Schema.subjectSchema)
+      const isExists = await Model.exists({Name: name})
+      if(isExists){
+        const docs = await Model.find({Name: name})
+        if(docs){
+          await Model.updateOne({Name: name}, {Subject: docs[0].Subject.concat(data)})
+        }
+      } else {
+        const row = new Model()
+        row.Name = name
+        row.Subject = data
+        row.save((err) => {
+          console.log(err)
+        })
       }
-    })
-
+    } catch(err){
+      console.log(err)
+      throw err
+    }
   }
 }
 

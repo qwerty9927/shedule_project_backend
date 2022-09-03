@@ -21,8 +21,9 @@ class Craw {
           Thu: item[11],
           TBD: item[12],
           ST: item[13],
-          GiangVien: item[14],
-          Tuan: item[15]
+          Phong: item[14],
+          GiangVien: item[15],
+          Tuan: item[16]
         }
       })
       try {
