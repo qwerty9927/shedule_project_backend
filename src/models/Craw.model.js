@@ -1,12 +1,7 @@
-const DB = require("./DB.model");
 const createModel = require('../services/createModel.service')
 const Schema = require("./Schema.model")
 
-class CrawModel extends DB {
-  constructor() {
-    super()
-  }
-
+class CrawModel {
   async receiveData(data, collInfo) {
     const name = `${collInfo.school.toLowerCase()}_${collInfo.schoolYear.toLowerCase()}_${collInfo.code.toLowerCase()}`
     try {
