@@ -1,15 +1,10 @@
 const { ObjectId } = require('mongodb')
 const fs = require('fs')
-const DB = require('./DB.model')
 const Schema = require('./Schema.model')
 const createModel = require('../services/createModel.service')
 require('../utils/dbTool')
 require('dotenv').config()
-class SubjectModel extends DB {
-  constructor() {
-    super()
-  }
-
+class SubjectModel {
   async insertSubject(data, collInfo) {
     const collName = collInfo.school.toLowerCase()
     const name = `${collName}_${collInfo.schoolYear.toLowerCase()}_${collInfo.code.toLowerCase()}`
