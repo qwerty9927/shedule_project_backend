@@ -5,9 +5,9 @@ const createModel = require('../services/createModel.service')
 require('../utils/dbTool')
 require('dotenv').config()
 class SubjectModel {
-  async insertSubject(data, collInfo) {
-    const collName = collInfo.school.toLowerCase()
-    const name = `${collName}_${collInfo.schoolYear.toLowerCase()}_${collInfo.code.toLowerCase()}`
+  async insertSubject(data, docInfo) {
+    const collName = docInfo.school.toLowerCase()
+    const name = `${collName}_${docInfo.schoolYear.toLowerCase()}_${docInfo.code.toLowerCase()}`
     const Model = createModel(collName, Schema.subjectSchema)
     try {
       await Model.updateOne({ Name: name }, { $push: { Subject: data.values } })
@@ -26,22 +26,22 @@ class SubjectModel {
     return dataHandled
   }
 
-  async updateSubject(data, collInfo) {
-    const collName = collInfo.school.toLowerCase()
-    const name = `${collName}_${collInfo.schoolYear.toLowerCase()}_${collInfo.code.toLowerCase()}`
+  async updateSubject(data, docInfo) {
+    const collName = docInfo.school.toLowerCase()
+    const name = `${collName}_${docInfo.schoolYear.toLowerCase()}_${docInfo.code.toLowerCase()}`
     const Model = createModel(collName, Schema.subjectSchema)
     const values = this.handleData(data.values)
     try {
-      await Model.updateOne({ Name: name, "Subject._id": ObjectId(data._id) }, values)
+      await Model.updateOne({ Name: name, "Subject._id": ObjectId(data.idSubject) }, values)
     } catch (err) {
       console.log(err)
       throw err
     }
   }
 
-  async deleteSubject(id, collInfo) {
-    const collName = collInfo.school.toLowerCase()
-    const name = `${collName}_${collInfo.schoolYear.toLowerCase()}_${collInfo.code.toLowerCase()}`
+  async deleteSubject(id, docInfo) {
+    const collName = docInfo.school.toLowerCase()
+    const name = `${collName}_${docInfo.schoolYear.toLowerCase()}_${docInfo.code.toLowerCase()}`
     const Model = createModel(collName, Schema.subjectSchema)
     try {
       await Model.updateOne({ Name: name }, { $pull: { Subject: { _id: ObjectId(id) } } })
@@ -52,9 +52,9 @@ class SubjectModel {
 
   }
 
-  async getSubject(collInfo) {
-    const name = `${collInfo.school.toLowerCase()}_${collInfo.schoolYear.toLowerCase()}_${collInfo.code.toLowerCase()}`
-    const Model = createModel(collInfo.school.toLowerCase(), Schema.subjectSchema)
+  async getSubject(docInfo) {
+    const name = `${docInfo.school.toLowerCase()}_${docInfo.schoolYear.toLowerCase()}_${docInfo.code.toLowerCase()}`
+    const Model = createModel(docInfo.school.toLowerCase(), Schema.subjectSchema)
     const isExists = await Model.exists({ Name: name })
     if (isExists) {
       const result = await Model.find()
@@ -64,27 +64,29 @@ class SubjectModel {
     }
   }
 
-  async searchSubject(searchInfo, collInfo) {
+  async searchSubject(searchInfo, docInfo) {
     const result = []
     const indexStartSearch = 2
     const indexNameSubject = 1
     let sizeNeed = process.env.DB_DEFAULT_COUNT_SELECT // support for limit
 
     try {
-      const path = __basedir + `\\src\\docs\\${collInfo.school}.txt`
+      const path = __basedir + `\\src\\docs\\${docInfo.school}.txt`
       const data = fs.readFileSync(path, "utf8")
       const array = data.split('#').map(itemRoot => {
         const temp = itemRoot.split('\r\n')
-        const compareArr = temp[indexStartSearch].toLowerCase().split('*')
-        if (compareArr[0].startsWith(searchInfo.value) || compareArr[1].startsWith(searchInfo.value)) {
-          return temp[indexNameSubject]
+        for(let i = indexStartSearch;i < temp.length - 1;i++){
+          const compareArr = temp[i].toLowerCase().split('*')
+          if (compareArr[0].startsWith(searchInfo.value) || compareArr[1].startsWith(searchInfo.value)) {
+            return temp[indexNameSubject]
+          }
         }
       })
       console.log(array)
       for (let i of array) {
         if (i) {
-          const name = `${collInfo.school.toLowerCase()}_${collInfo.schoolYear.toLowerCase()}_${i.toLowerCase()}`
-          const Model = createModel(collInfo.school.toLowerCase(), Schema.subjectSchema)
+          const name = `${docInfo.school.toLowerCase()}_${docInfo.schoolYear.toLowerCase()}_${i.toLowerCase()}`
+          const Model = createModel(docInfo.school.toLowerCase(), Schema.subjectSchema)
           const subResult = await Model.find({
             Name: name,
             $or: [
@@ -96,7 +98,9 @@ class SubjectModel {
               }
             ]
           })
-          result.push(...subResult[0].Subject)
+          if(subResult.length){
+            result.push(...subResult[0].Subject)
+          }
         }
       }
       return result.skip((searchInfo.page - 1) * process.env.DB_DEFAULT_COUNT_SELECT)
@@ -105,10 +109,6 @@ class SubjectModel {
       console.log(err)
       throw err
     }
-  }
-
-  async addSubjectOfShedule(data, collInfo) {
-
   }
 }
 
