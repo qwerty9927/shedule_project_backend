@@ -1,28 +1,24 @@
 const express = require('express')
-const Subject = require('../controllers/Subject.controller')
+const Shedule = require('../controllers/Shedule.controller')
 const router = express.Router()
+const verifyTokenUser = require('../middlewares/verifyTokenUser')
 
-// Get all row of subject
-router.get('/', Subject.getSubject)
+// Middleware
+router.use(verifyTokenUser)
 
-// Search subject
-router.get('/search', Subject.searchSubject)
+// Create shedule
+router.get('/createTable', Shedule.createTable)
 
-// Middelware
+// Delete shedule
+router.delete('/deleteTable', Shedule.deleteTable)
 
 // Add subject for shedule
-router.post('/addSubjectoOfShedule', Subject.addSubjectOfShedule)
-
-// // Edit subject of shedule
-// router.put('/editSubjectOfShedule', Subject.editSubjectOfShedule)
+router.post('/addSubjectOfTable', Shedule.addSubjectOfTable)
 
 // // Delete subject of shedule
-// router.delete('/deleteSubjectOfShedule', Subject.deleteSubjectOfShedule)
+router.delete('/deleteSubjectOfTable', Shedule.deleteSubjectOfTable)
 
-// // Delete shedule
-// router.delete('/deleteShedule', Subject.deleteShedule)
 
-// // Save shedule
-// router.delete('/saveShedule', Subject.saveShedule)
+
 
 module.exports = router

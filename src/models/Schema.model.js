@@ -29,11 +29,14 @@ const subjectSchema = new Schema({
 const sheduleSchema = new Schema({
   ListShedule: [
     {
-      Name: String,
-      NameShedule: String,
-      idSubject: ObjectId
+      NameTable: String,
+      ListSubject: [{
+        Name: String,
+        idSubject: ObjectId
+      }]
     }
-  ]
+  ],
+  QuantityShedule: Number
 })
 
 const loginSchema_1 = new Schema({
@@ -42,8 +45,7 @@ const loginSchema_1 = new Schema({
   Fullname: String,
   Image: String,
   Role: Number,
-  CountShedule: Number,
-  Shedule: ObjectId
+  idShedule: ObjectId
 },{
   timestamps: true
 })
@@ -53,8 +55,7 @@ const loginSchema_2 = new Schema({
   Fullname: String,
   Image: String,
   Role: Number,
-  CountShedule: Number,
-  Shedule: ObjectId
+  idShedule: ObjectId
 },{
   timestamps: true
 })
