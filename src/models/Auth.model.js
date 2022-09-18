@@ -1,5 +1,6 @@
 
 const Schema = require('./Schema.model')
+const bcrypt = require('bcrypt')
 const createModel = require("../services/createModel.service")
 class AuthModel {
   async findUser(data){
@@ -7,6 +8,16 @@ class AuthModel {
       const Model = createModel(process.env.LOGIN_1_COLLECTION, Schema.loginSchema_1)
       const result = await Model.findOne({ Email: data.Email })
       return result
+    } catch(err){
+      throw err
+    }
+  }
+
+  async createSheduleList(){
+    try {
+      const Model = createModel(process.env.SHEDULE_COLLECTION, Schema.sheduleSchema)
+      const doc = await Model.create({QuantityShedule: 0})
+      return doc._id
     } catch(err){
       throw err
     }

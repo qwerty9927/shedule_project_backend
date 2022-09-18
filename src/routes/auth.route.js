@@ -15,6 +15,6 @@ router.post('/resgister', Auth.resgister)
 router.get('/refreshToken', Auth.refreshToken)
 
 // // Logout
-// router.get('/logout', Auth.logout)
+router.get('/logout', Auth.logout)  
 
 module.exports = router
