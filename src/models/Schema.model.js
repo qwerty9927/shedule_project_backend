@@ -21,7 +21,8 @@ const subjectSchema = new Schema({
       ST: Array,
       Phong: Array,
       GiangVien: Array,
-      Tuan: Array
+      Tuan: Array,
+      CS: Array
     }
   ],
 })
@@ -30,10 +31,16 @@ const sheduleSchema = new Schema({
   ListShedule: [
     {
       NameTable: String,
-      ListSubject: [{
-        Name: String,
-        idSubject: ObjectId
-      }]
+      ListSubject: Array,
+      Shedule: Array,
+      EmptyTime: {
+        2: Array,
+        3: Array,
+        4: Array,
+        5: Array,
+        6: Array,
+        7: Array
+      }
     }
   ],
   QuantityShedule: Number

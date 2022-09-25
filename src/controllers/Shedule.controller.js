@@ -26,15 +26,31 @@ class Shedule {
     // data {idShedule, idTable, idSubject}
     if (school && schoolYear && code && data.idShedule && data.idTable && data.idSubject) {
       try {
-        const boolean = await SheduleModel.addSubjectOfTable(data, { school, schoolYear, code })
-        if(boolean){
-          res.status(200).json({
-            status: 200,
-            meg: "Success"
-          })
-        } else {
-          next(createError.InternalServerError())
-        }
+        await SheduleModel.addSubjectOfTable(data, { school, schoolYear, code })
+        res.status(200).json({
+          status: 200,
+          meg: "Success"
+        })
+      } catch (err) {
+        console.log(err)
+        next(createError(500, err))
+      }
+    } else {
+      next(createError.UnprocessableEntity())
+    }
+  }
+
+  async deleteTable(req, res, next) {
+    const data = req.query
+    data.idShedule = req.idShedule || "631ed00e4ad305f35e3c6b8d"
+    // data {idShedule, idTable}
+    if (data.idShedule && data.idTable) {
+      try {
+        await SheduleModel.deleteTable(data)
+        res.status(200).json({
+          status: 200,
+          meg: "Success"
+        })
       } catch (err) {
         console.log(err)
         next(createError.InternalServerError())
@@ -44,38 +60,18 @@ class Shedule {
     }
   }
 
-  async deleteTable(req, res, next){
-    const data = req.query
-    data.idShedule = req.idShedule || "631ed00e4ad305f35e3c6b8d"
-    // data {idShedule, idTable}
-    if(data.idShedule && data.idTable){
-      try {
-        await SheduleModel.deleteTable(data)
-        res.status(200).json({
-          status: 200,
-          meg: "Success"
-        })
-      } catch(err){
-        console.log(err)
-        next(createError.InternalServerError())
-      }
-    } else {
-      next(createError.UnprocessableEntity())
-    }
-  }
-
-  async deleteSubjectOfTable(req, res, next){
+  async deleteSubjectOfTable(req, res, next) {
     const data = req.body
     data.idShedule = req.idShedule || "631ed00e4ad305f35e3c6b8d"
     // data {idShedule, idTable, idSubject}
-    if(data.idShedule && data.idTable && data.idSubject){
+    if (data.idShedule && data.idTable && data.idSubject) {
       try {
         await SheduleModel.deleteSubjectOfTable(data)
         res.status(200).json({
           status: 200,
           meg: "Success"
         })
-      } catch(err){
+      } catch (err) {
         console.log(err)
         next(createError.InternalServerError())
       }
