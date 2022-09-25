@@ -4,6 +4,7 @@ const Schema = require("./Schema.model")
 class CrawModel {
   async receiveData(data, collInfo) {
     const name = `${collInfo.school.toLowerCase()}_${collInfo.schoolYear.toLowerCase()}_${collInfo.code.toLowerCase()}`
+    console.log(data)
     try {
       const Model = createModel(collInfo.school.toLowerCase(), Schema.subjectSchema)
       const isExists = await Model.exists({Name: name})

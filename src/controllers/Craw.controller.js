@@ -1,4 +1,5 @@
 const createError = require('http-errors')
+const {convertDayToNumber, convertStringToNumber, createCodeCS} = require('../utils/convert')
 const CrawModel = require('../models/Craw.model')
 
 class Craw {
@@ -7,6 +8,12 @@ class Craw {
     const { code, schoolYear, school } = req.query
     if (code && schoolYear && school && data) {
       const obj = data.map((item, index) => {
+        console.log({
+          Thu: convertDayToNumber(item[11]),
+          TBD: convertStringToNumber(item[12]),
+          ST: convertStringToNumber(item[13]),
+          CS: createCodeCS(item[14])
+        })
         return {
           MaMH: item[1],
           TenMH: item[2],
@@ -18,14 +25,17 @@ class Craw {
           SiSo: item[8],
           CL: item[9],
           TH: item[10],
-          Thu: item[11],
-          TBD: item[12],
-          ST: item[13],
+          Thu: convertDayToNumber(item[11]),
+          TBD: convertStringToNumber(item[12]),
+          ST: convertStringToNumber(item[13]),
           Phong: item[14],
           GiangVien: item[15],
-          Tuan: item[16]
+          Tuan: item[16],
+          CS: createCodeCS(item[14])
         }
       })
+      // console.log(obj)
+
       try {
         CrawModel.receiveData(obj, { code, schoolYear, school })
         res.sendStatus(200)
