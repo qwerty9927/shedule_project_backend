@@ -19,14 +19,14 @@ class Shedule {
     }
   }
 
-  async addSubjectOfTable(req, res, next) {
-    const { school, schoolYear, code } = req.query
+  async saveSubjectOfTable(req, res, next) {
+    const { school } = req.query
     const data = req.body
     data.idShedule = req.idShedule || "631ed00e4ad305f35e3c6b8d"
     // data {idShedule, idTable, idSubject}
-    if (school && schoolYear && code && data.idShedule && data.idTable && data.idSubject) {
+    if (school && data.idShedule && data.idTable && data.Subject) {
       try {
-        await SheduleModel.addSubjectOfTable(data, { school, schoolYear, code })
+        await SheduleModel.saveSubjectOfTable(data, { school })
         res.status(200).json({
           status: 200,
           meg: "Success"
@@ -64,7 +64,7 @@ class Shedule {
     const data = req.body
     data.idShedule = req.idShedule || "631ed00e4ad305f35e3c6b8d"
     // data {idShedule, idTable, idSubject}
-    if (data.idShedule && data.idTable && data.idSubject) {
+    if (data.idShedule && data.idTable && data.Subject.MaMH && data.Subject.NMH) {
       try {
         await SheduleModel.deleteSubjectOfTable(data)
         res.status(200).json({

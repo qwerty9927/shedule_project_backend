@@ -13,7 +13,7 @@ router.get('/createTable', Shedule.createTable)
 router.delete('/deleteTable', Shedule.deleteTable)
 
 // Add subject for shedule
-router.post('/addSubjectOfTable', Shedule.addSubjectOfTable)
+router.post('/saveSubjectOfTable', Shedule.saveSubjectOfTable)
 
 // // Delete subject of shedule
 router.delete('/deleteSubjectOfTable', Shedule.deleteSubjectOfTable)

@@ -20,12 +20,15 @@ class SheduleModel {
     }
   }
 
-  subjectIsExist(MAMH, listSubject){
-    listSubject.forEach(item => {
-      if(item === MAMH){
-        throw new Error("Subject existed!")
+  subjectIsExist(listSubject, listSubjectInDB) {
+    let i, j
+    for (i of listSubject) {
+      for (j of listSubjectInDB) {
+        if (i.MaMH === j.MaMH) {
+          throw new Error("Subject existed!")
+        }
       }
-    })
+    }
   }
 
   checkSlot(THU, TBD, ST, CS, timeArr) {
@@ -36,20 +39,20 @@ class SheduleModel {
     const afterBreakTimeInTheMorning = 3
     const beforeBreakTimeInTheAfternoon = 7
     const afterBreakTimeInTheAfternoon = 8
-    THU.forEach((item, index) => {    
+    THU.forEach((item, index) => {
       const indexForTBD = TBD[index] - 1
       let i = indexForTBD
       let timeInDay = timeArr[`${item}`]
-      if(!timeInDay.length){
+      if (!timeInDay.length) {
         timeInDay = new Array(14).fill(0)
       }
       const TKT = TBD[index] + ST[index] - 1
       const indexForTKT = TKT - 1
       if (TKT <= pivot) {
-        if ((TBD[index] === startLessonInTheMorning && timeInDay[indexForTKT + 1] === CS[index]) 
-          || timeInDay[indexForTBD - 1] === CS[index] 
-          || timeInDay[indexForTBD - 1] === 0 
-          || TBD[index] === afterBreakTimeInTheMorning 
+        if ((TBD[index] === startLessonInTheMorning && timeInDay[indexForTKT + 1] === CS[index])
+          || timeInDay[indexForTBD - 1] === CS[index]
+          || timeInDay[indexForTBD - 1] === 0
+          || TBD[index] === afterBreakTimeInTheMorning
           || TKT === beforeBreakTimeInTheMorning
         ) {
           for (i; i < TKT; i++) {
@@ -58,68 +61,79 @@ class SheduleModel {
             }
           }
           timeArr[`${item}`] = timeInDay.fill(CS[index], indexForTBD, TKT)
-          console.log(timeInDay)
         } else {
           throw new Error("Different area error")
         }
       } else {
         if ((TBD[index] === startLessonInTheAfternoon && timeInDay[indexForTKT + 1] === CS[index])
-        || timeInDay[indexForTBD - 1] === CS[index] 
-        || timeInDay[indexForTBD - 1] === 0 
-        || TBD[index] === afterBreakTimeInTheAfternoon
-        || TKT === beforeBreakTimeInTheAfternoon
-      ) {
+          || timeInDay[indexForTBD - 1] === CS[index]
+          || timeInDay[indexForTBD - 1] === 0
+          || TBD[index] === afterBreakTimeInTheAfternoon
+          || TKT === beforeBreakTimeInTheAfternoon
+        ) {
           for (i; i < TKT; i++) {
             if (timeInDay[i] !== 0) {
               throw new Error("Conflict or difference error")
             }
           }
-          timeArr[`${item}`] =  timeInDay.fill(CS[index], indexForTBD, TKT)
+          timeArr[`${item}`] = timeInDay.fill(CS[index], indexForTBD, TKT)
         } else {
           throw new Error("Different area error")
         }
       }
     })
-    console.log(timeArr)
     return timeArr
   }
 
-  async actionAdd(data, MAMH, listEmptyTime){
+  async actionAdd(data, listSubject, listEmptyTime, Model) {
     try {
-      const ModelShedule = createModel(process.env.SHEDULE_COLLECTION, Schema.sheduleSchema)
-      await ModelShedule.updateOne(
+      await Model.updateMany(
         {
           _id: ObjectId(data.idShedule),
           "ListShedule._id": ObjectId(data.idTable),
         },
-        { $push: { "ListShedule.$.Shedule": data.idSubject, "ListShedule.$.ListSubject": MAMH }, "ListShedule.$.EmptyTime": listEmptyTime }
+        {
+          $push: {
+            "ListShedule.$.Shedule": listSubject
+          },
+          "ListShedule.$.EmptyTime": listEmptyTime
+        }
       )
     } catch (err) {
       throw err
     }
   }
 
-  async addSubjectOfTable(data, docInfo) {
+  async isExistSubject(data, Model) {
+    const accuracy = []
+    for (let i of data.Subject) {
+      const result = await Model.find({ "Subject.MaMH": i.MaMH, "Subject.NMH": i.NMH }, { "Subject.$": 1 })
+      if (result.length) {
+        const subResult = result[0].Subject[0]
+        accuracy.push({ ...i, Thu: subResult.Thu, TBD: subResult.TBD, ST: subResult.ST, CS: subResult.CS })
+      }
+    }
+    return accuracy
+  }
+
+  async saveSubjectOfTable(data, docInfo) {
     const collName = docInfo.school.toLowerCase()
-    const name = `${collName}_${docInfo.schoolYear.toLowerCase()}_${docInfo.code.toLowerCase()}`
     try {
       const ModelSgu = createModel(collName, Schema.subjectSchema)
       const ModelShedule = createModel(process.env.SHEDULE_COLLECTION, Schema.sheduleSchema)
-      const result = (await ModelSgu.find({ Name: name, "Subject._id": ObjectId(data.idSubject) }, { "Subject.$": 1 }))
-      console.log(result)
-      if(result.length){
-        const resultTable = (await ModelShedule.find({ _id: ObjectId(data.idShedule), "ListShedule._id": ObjectId(data.idTable) }, {"ListShedule.$": 1}))
-        const subResult = result[0].Subject[0]
-        const listSubject = resultTable[0].ListShedule[0].ListSubject
-        const listEmptyTime = resultTable[0].ListShedule[0].EmptyTime
-
-        this.subjectIsExist(subResult.MaMH, listSubject)
-        const newListEmptyTime = this.checkSlot(subResult.Thu, subResult.TBD, subResult.ST, subResult.CS, listEmptyTime)
-        await this.actionAdd(data, subResult.MaMH, newListEmptyTime)
+      const result = await this.isExistSubject(data, ModelSgu) // subject is existed in db ?
+      if (result.length) {
+        const resultTable = (await ModelShedule.find({ _id: ObjectId(data.idShedule), "ListShedule._id": ObjectId(data.idTable) }, { "ListShedule.$": 1 }))
+        let listEmptyTime = resultTable[0].ListShedule[0].EmptyTime
+        this.subjectIsExist(result, resultTable[0].ListShedule[0].Shedule) // subject is existed in my shedule ?
+        result.forEach(item => {
+          listEmptyTime = this.checkSlot(item.Thu, item.TBD, item.ST, item.CS, listEmptyTime) // have slot ?
+        })
+        await this.actionAdd(data, result, listEmptyTime, ModelShedule) // add all
       } else {
         throw new Error("Subject not exist!")
       }
-    } catch(err){
+    } catch (err) {
       throw err.message
     }
   }
@@ -135,12 +149,30 @@ class SheduleModel {
     }
   }
 
+  changeEmptyTime(data, shedule, timeArr) {
+    let arr
+    shedule.forEach(rootItem => {
+      console.log(rootItem)
+      if (rootItem.MaMH === data.Subject.MaMH && rootItem.NMH === data.Subject.NMH) {
+        rootItem.Thu.forEach((item, index) => {
+          arr = timeArr[item].fill(0, rootItem.TBD[index] - 1, rootItem.TBD[index] - 1 + rootItem.ST[index])
+        })
+      }
+    })
+    return arr
+  }
+
   async deleteSubjectOfTable(data) {
     try {
       const Model = createModel(process.env.SHEDULE_COLLECTION, Schema.sheduleSchema)
+      const result = await Model.findOne({ _id: ObjectId(data.idShedule), "ListShedule._id": ObjectId(data.idTable) }, { "ListShedule.$": 1 })
+      const shedule = result.ListShedule[0].Shedule
+      const emptyTime = result.ListShedule[0].EmptyTime
+      const newTimeArr = this.changeEmptyTime(data, shedule, emptyTime)
       await Model.updateOne(
         { _id: ObjectId(data.idShedule), "ListShedule._id": ObjectId(data.idTable) },
-        { $pull: { "ListShedule.$.Shedule": { idSubject: data.idSubject } } })
+        { $pull: { "ListShedule.$.Shedule": { MaMH: data.Subject.MaMH, NMH: data.Subject.NMH } }, "ListShedule.$.EmptyTime": newTimeArr })
+
     } catch (err) {
       throw err
     }

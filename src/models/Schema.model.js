@@ -31,8 +31,18 @@ const sheduleSchema = new Schema({
   ListShedule: [
     {
       NameTable: String,
-      ListSubject: Array,
-      Shedule: Array,
+      // ListSubject: Array,
+      Shedule: [{
+        Name: String,
+        // idSubject: ObjectId,
+        MaMH: String,
+        NMH: String,
+        Thu: Array,
+        TBD: Array,
+        ST: Array,
+        CS: Array,
+        Color: String
+      }],
       EmptyTime: {
         2: Array,
         3: Array,
